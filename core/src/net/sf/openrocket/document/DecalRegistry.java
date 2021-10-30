@@ -190,7 +190,7 @@ public class DecalRegistry {
 		 * 
 		 * @return
 		 */
-		File getFileSystemLocation() {
+		public File getFileSystemLocation() {
 			return fileSystemLocation;
 		}
 		

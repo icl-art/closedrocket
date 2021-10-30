@@ -40,4 +40,10 @@ public interface DecalImage extends ChangeSource, Comparable<DecalImage> {
 	 * @param source	The source of the wake up call
 	 */
 	public void fireChangeEvent(Object source);
+
+	/**
+	 * Find out where this is stored on the filesystem
+	 * @return The corresponding file
+	 */
+	public File getFileSystemLocation();
 }

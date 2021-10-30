@@ -104,7 +104,7 @@ public class GeneralRocketSaver {
 			s = new ProgressOutputStream(s, estimatedSize, progress);
 		}
 		try {
-			save(dest.getName(), s, doc, opts);
+			save(dest.getParent(), dest.getName(), s, doc, opts);
 		} finally {
 			s.close();
 		}
@@ -145,7 +145,7 @@ public class GeneralRocketSaver {
 		}
 	}
 	
-	private void save(String fileName, OutputStream output, OpenRocketDocument document, StorageOptions options) throws IOException {
+	private void save(String dir, String fileName, OutputStream output, OpenRocketDocument document, StorageOptions options) throws IOException {
 		
 		// For now, we don't save decal inforamtion in ROCKSIM files, so don't do anything
 		// which follows.
@@ -178,47 +178,26 @@ public class GeneralRocketSaver {
 			}
 		}
 		
-		saveAllPartsZipFile(output, document, options, usedDecals);
-	}
-	
-	public void saveAllPartsZipFile(OutputStream output, OpenRocketDocument document, StorageOptions options, Set<DecalImage> decals) throws IOException {
-		
-		// Open a zip stream to write to.
-		ZipOutputStream zos = new ZipOutputStream(output);
-		zos.setLevel(9);
-		// big try block to close the zos.
-		try {
-			
-			
-			ZipEntry mainFile = new ZipEntry("rocket.ork");
-			zos.putNextEntry(mainFile);
-			saveInternal(zos, document, options);
-			zos.closeEntry();
-			
-			// Now we write out all the decal images files.
-			
-			for (DecalImage image : decals) {
-				
-				String name = image.getName();
-				ZipEntry decal = new ZipEntry(name);
-				zos.putNextEntry(decal);
-				
-				InputStream is = image.getBytes();
-				int bytesRead = 0;
-				byte[] buffer = new byte[2048];
+		saveInternal(output, document, options);
+
+		// Now we write out all the decal images files.
+
+		for (DecalImage image : usedDecals) {
+			File location = image.getFileSystemLocation();
+			String name = location == null ? dir + "\\" + image.getName() : location.toString();
+			InputStream is = image.getBytes();
+			int bytesRead = 0;
+			byte[] buffer = new byte[2048];
+			System.out.println(name);
+			try (OutputStream fos = new FileOutputStream(name)) {
 				while ((bytesRead = is.read(buffer)) > 0) {
-					zos.write(buffer, 0, bytesRead);
+					fos.write(buffer, 0, bytesRead);
 				}
-				zos.closeEntry();
+				fos.flush();
 			}
-			
-			zos.flush();
-		} finally {
-			zos.close();
 		}
-		
-		
 	}
+
 	
 	// package scope for testing.
 	

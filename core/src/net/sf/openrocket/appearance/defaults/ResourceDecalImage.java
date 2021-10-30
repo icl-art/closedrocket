@@ -48,7 +48,12 @@ public class ResourceDecalImage implements DecalImage {
 	@Override
 	public void fireChangeEvent(Object source) {
 	}
-	
+
+	@Override
+	public File getFileSystemLocation() {
+		return null;
+	}
+
 	@Override
 	public void addChangeListener(StateChangeListener listener) {
 		//Unimplemented, this can not change
